@@ -3,23 +3,23 @@
 # Run dev DB and apply migrations
 dev-db: start_podman
   podman-compose up -d
-  dotnet ef database update --startup-project backend/EveSilo.Api -- --environment Development
+  dotnet ef database update --startup-project backend/xYard.Api -- --environment Development
 
 # Run prod DB and apply migrations
 prod-db: start_podman
   podman-compose up -d
-  dotnet ef database update --startup-project backend/EveSilo.Api -- --environment Production
+  dotnet ef database update --startup-project backend/xYard.Api -- --environment Production
 
 # Reset für DEV-Datenbank (idempotent)
 db-reset-dev:
   @echo "⛏️  Resetting DEV database volume…"
   # 1) DEV-Container stoppen/entfernen (ignoriert Fehler, falls nicht vorhanden)
-  -podman stop evesilo_db_dev
-  -podman rm -f evesilo_db_dev
+  -podman stop xYard_db_dev
+  -podman rm -f xYard_db_dev
   # 2) Alle Container killen, die das Volume noch halten (falls der Name anders war)
-  -for id in $$(podman ps -a -q --filter volume=evesilo_db_data_dev); do podman rm -f $$id; done
+  -for id in $$(podman ps -a -q --filter volume=xYard_db_data_dev); do podman rm -f $$id; done
   # 3) Volume löschen (jetzt sollte es frei sein)
-  -podman volume rm evesilo_db_data_dev
+  -podman volume rm xYard_db_data_dev
   # 4) DEV-DB frisch starten
   podman-compose up -d db-dev
   # 5) Optional: DB migrieren / seeden
@@ -36,7 +36,7 @@ db-reset-prod CONFIRM='':
   fi
   @echo "✅ Confirmation received. Resetting production database volume..."
   podman-compose stop db-prod
-  podman volume rm evesilo_db_data_prod
+  podman volume rm xYard_db_data_prod
   podman-compose up -d db-prod
 
 # Apply migrations
@@ -44,13 +44,13 @@ migrate MIGRATION:
   echo "Creating EF migration: {{MIGRATION}}"
   dotnet ef migrations add {{MIGRATION}} \
     --project Core.Data \
-    --startup-project backend/EveSilo.Api
+    --startup-project backend/xYard.Api
 
 update-db:
   echo "Updating database"
   dotnet ef database update \
     --project Core.Data \
-    --startup-project backend/EveSilo.Api
+    --startup-project backend/xYard.Api
 
 # Startet die Podman-VM nur, wenn sie nicht läuft
 start_podman:
@@ -58,14 +58,14 @@ start_podman:
   
 
 backend-dev: start_podman
-  ASPNETCORE_ENVIRONMENT=Development ASPNETCORE_URLS=http://localhost:5123 dotnet run --no-launch-profile --project backend/EveSilo.Api
+  ASPNETCORE_ENVIRONMENT=Development ASPNETCORE_URLS=http://localhost:5123 dotnet run --no-launch-profile --project backend/xYard.Api
 
 backend-prod:
   bash -c 'podman machine start || [ $$? -eq 125 ]'
   echo "Updating database"
-  ASPNETCORE_ENVIRONMENT=Production  dotnet ef database update     --project Core.Data     --startup-project backend/EveSilo.Api
+  ASPNETCORE_ENVIRONMENT=Production  dotnet ef database update     --project Core.Data     --startup-project backend/xYard.Api
   echo "Starting backend"
-  ASPNETCORE_ENVIRONMENT=Production ASPNETCORE_URLS=http://localhost:5123 dotnet run --no-launch-profile --project backend/EveSilo.Api
+  ASPNETCORE_ENVIRONMENT=Production ASPNETCORE_URLS=http://localhost:5123 dotnet run --no-launch-profile --project backend/xYard.Api
 
 
 
