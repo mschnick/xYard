@@ -1,0 +1,30 @@
+services:
+  db-dev:
+    image: postgres:15
+    container_name: xyard_db_dev
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: xyard_dev
+    volumes:
+      - db_data_dev:/var/lib/postgresql/data   # <-- KEY referenzieren
+
+  db-prod:
+    image: postgres:15
+    container_name: xyard_db_prod
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: xyard_prod
+    volumes:
+      - db_data_prod:/var/lib/postgresql/data  # <-- KEY referenzieren
+
+volumes:
+  db_data_dev:
+    name: xyard_db_data_dev     # fester System-Name
+  db_data_prod:
+    name: xyard_db_data_prod
