@@ -1,0 +1,6 @@
+@xYard.Api_HostAddress = http://localhost:5046
+
+GET {{xYard.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
