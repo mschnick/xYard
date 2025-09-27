@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using xYard.Infrastructure.Db;
+using Serilog;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,6 +9,13 @@ var builder = WebApplication.CreateBuilder(args);
 // Add DbContext with PostgreSQL
 builder.Services.AddDbContext<XYardDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .Enrich.FromLogContext()
+    .CreateLogger();
+
+builder.Host.UseSerilog();
 
 // Add controllers, Swagger, etc.
 builder.Services.AddControllers();
